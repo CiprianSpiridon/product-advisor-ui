@@ -33,6 +33,9 @@ export const ProductBottomSheet: React.FC<ProductBottomSheetProps> = ({
   
   // Reference to the content div for touch events
   const contentRef = useRef<HTMLDivElement>(null);
+  
+  // State for collapsible description
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   // Set the current product and find its index in the product array
   useEffect(() => {
@@ -42,8 +45,23 @@ export const ProductBottomSheet: React.FC<ProductBottomSheetProps> = ({
       if (index !== -1) {
         setCurrentIndex(index);
       }
+      
+      // Reset description expanded state when product changes
+      setIsDescriptionExpanded(false);
     }
   }, [product, products]);
+  
+  // Scroll to top when sheet opens
+  useEffect(() => {
+    if (isOpen && contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  }, [isOpen, currentProduct]);
+
+  // Toggle description expand/collapse
+  const toggleDescription = () => {
+    setIsDescriptionExpanded(!isDescriptionExpanded);
+  };
 
   // Navigate to the next product
   const goToNext = () => {
@@ -205,7 +223,17 @@ export const ProductBottomSheet: React.FC<ProductBottomSheetProps> = ({
           {/* Product description */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-2 text-gray-700">Description</h3>
-            <p className="text-gray-600">{currentProduct?.fullDescription}</p>
+            <p className={`text-gray-600 ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}>
+              {currentProduct?.fullDescription}
+            </p>
+            {currentProduct?.fullDescription && currentProduct.fullDescription.length > 100 && (
+              <button 
+                onClick={toggleDescription}
+                className="text-blue-600 text-sm font-medium mt-1 hover:text-blue-800"
+              >
+                {isDescriptionExpanded ? 'Read less' : 'Read more'}
+              </button>
+            )}
           </div>
           
           {/* Features */}
