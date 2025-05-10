@@ -9,6 +9,8 @@ export interface ProductType {
   topCategory: string;
   secondaryCategory: string;
   fullDescription: string;
+  image?: string;
+  url?: string;
 }
 
 export interface ApiRelatedProduct {
@@ -20,6 +22,11 @@ export interface ApiRelatedProduct {
   recom_age: string;
   top_category: string;
   secondary_category: string;
+  action: string;
+  url: string;
+  image: string;
+  objectID: string;
+  price?: string;
 }
 
 export interface ApiResponse {

@@ -35,6 +35,41 @@ Simply type your product questions in the chat input field. For example:
 
 The assistant will respond with information based on the products available in the database, and related products will appear in the sidebar.
 
+## Recommended Product Data Structure
+
+When the assistant provides product recommendations, each recommended product will adhere to the following JSON structure:
+
+```json
+{
+  "sku": "SKU123",
+  "name": "Interactive Learning Tablet",
+  "brand_default_store": "EduKids",
+  "description": "A fun and educational tablet for young children with interactive games and learning activities.",
+  "features": "10-inch HD screen, pre-loaded educational apps, parental controls, durable design",
+  "recom_age": "3-6 years",
+  "top_category": "Toys & Games",
+  "secondary_category": "Educational Toys",
+  "action": "View Product",
+  "url": "https://example.com/product/tablet123",
+  "image": "https://example.com/images/tablet123.jpg",
+  "objectID": "product_123456789"
+}
+```
+
+Where:
+- `sku`: (string) Product Stock Keeping Unit
+- `name`: (string) Product Name
+- `brand_default_store`: (string) Brand or Default Store
+- `description`: (string) Product Description
+- `features`: (string) Key Features
+- `recom_age`: (string) Recommended Age Range
+- `top_category`: (string) Main Product Category
+- `secondary_category`: (string) Sub-category
+- `action`: (string) Call to action text (e.g., "Buy Now", "Learn More")
+- `url`: (string) Direct URL to the product page
+- `image`: (string) URL to the product image
+- `objectID`: (string) Unique identifier for the product object (e.g., from a database or search index)
+
 ## Building for Production
 
 ```bash

@@ -55,6 +55,15 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
             >
               <div className="border border-gray-200 rounded-lg p-3 h-full flex flex-col justify-between hover:shadow-md transition bg-white cursor-pointer">
                 <div>
+                  <img
+                    src={product.image || 'https://via.placeholder.com/200x150?text=No+Image'}
+                    alt={product.title}
+                    className="w-full h-32 object-cover rounded-md mb-2"
+                    onError={(e) => {
+                      console.log('Image failed to load:', product.image);
+                      e.currentTarget.src = 'https://via.placeholder.com/200x150?text=No+Image';
+                    }}
+                  />
                   <h3 className="font-bold text-sm text-gray-800 truncate" title={product.title}>{product.title}</h3>
                   <p className="text-xs text-gray-500 truncate" title={product.category}>{product.category}</p>
                   <p className="text-xs text-gray-600 mt-1 line-clamp-2 h-8" title={product.fullDescription}>

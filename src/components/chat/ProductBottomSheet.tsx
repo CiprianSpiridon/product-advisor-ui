@@ -166,6 +166,21 @@ export const ProductBottomSheet: React.FC<ProductBottomSheetProps> = ({
         
         {/* Product details content */}
         <div className="p-6">
+          {/* Product image */}
+          {currentProduct?.image && (
+            <div className="mb-6 flex justify-center">
+              <img 
+                src={currentProduct.image} 
+                alt={currentProduct.title} 
+                className="max-h-64 object-contain rounded-md"
+                onError={(e) => {
+                  console.log('Image failed to load:', currentProduct.image);
+                  e.currentTarget.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                }}
+              />
+            </div>
+          )}
+        
           {/* Brand and SKU */}
           <div className="mb-4 flex justify-between items-center">
             <span className="text-gray-500 text-sm">SKU: {currentProduct?.id}</span>
@@ -208,6 +223,25 @@ export const ProductBottomSheet: React.FC<ProductBottomSheetProps> = ({
             <h3 className="text-lg font-medium mb-2 text-gray-700">Recommended Age</h3>
             <p className="text-gray-600">{currentProduct?.ageRange}</p>
           </div>
+
+          {/* Price section */}
+          <div className="mb-6">
+            <h3 className="text-lg font-medium mb-2 text-gray-700">Price</h3>
+            <p className="text-gray-600 text-xl font-bold text-blue-600">{currentProduct?.price}</p>
+          </div>
+
+          {currentProduct?.url && (
+            <div className="mb-4">
+              <a 
+                href={currentProduct.url} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-full block text-center font-medium py-3 px-4 rounded-lg transition border border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                View on Website
+              </a>
+            </div>
+          )}
           
           {/* Call to action button */}
           <button
