@@ -22,19 +22,30 @@ interface Message {
   sender: 'user' | 'assistant';
 }
 
-// NEW structure for related products from the API
+// Updated structure for related products from the API
 interface ApiRelatedProduct {
   sku: string;
   name: string;
   description: string;
+  brand_default_store: string;
+  features: string;
+  recom_age: string;
+  top_category: string;
+  secondary_category: string;
 }
 
-// Keep the existing RelatedProduct for the UI, but adapt it
+// Keep the existing RelatedProduct for the UI but include new fields
 interface RelatedProduct {
   id: string; // Will be mapped from sku
   title: string; // Will be mapped from name
   price: string; // Will default to "N/A" or be handled
   category: string; // Will use description or a placeholder
+  brand: string; // From brand_default_store
+  features: string; // From features
+  ageRange: string; // From recom_age
+  topCategory: string; // From top_category
+  secondaryCategory: string; // From secondary_category
+  fullDescription: string; // Full description text
 }
 
 // Simplified API response structure
@@ -57,6 +68,9 @@ export default function ChatUI() {
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  // Bottom sheet state
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<RelatedProduct | null>(null);
   
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -125,7 +139,13 @@ export default function ChatUI() {
             id: product.sku,
             title: product.name,
             price: 'N/A', 
-            category: product.description.substring(0, 50) + (product.description.length > 50 ? '...' : ''),
+            category: `${product.top_category} > ${product.secondary_category}`,
+            brand: product.brand_default_store || 'N/A',
+            features: product.features || 'No features available',
+            ageRange: product.recom_age || 'All ages',
+            topCategory: product.top_category || 'Uncategorized',
+            secondaryCategory: product.secondary_category || '',
+            fullDescription: product.description || 'No description available'
           };
         });
         
@@ -145,6 +165,29 @@ export default function ChatUI() {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle product click
+  const handleProductClick = (product: RelatedProduct) => {
+    setSelectedProduct(product);
+    setIsBottomSheetOpen(true);
+  };
+
+  // Close bottom sheet
+  const closeBottomSheet = () => {
+    setIsBottomSheetOpen(false);
+    // After animation completes, clear the selected product
+    setTimeout(() => {
+      setSelectedProduct(null);
+    }, 300); // Match duration-300 from the animation
+  };
+
+  // Handle click on backdrop to close the sheet
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Only close if clicking the backdrop, not the content
+    if (e.target === e.currentTarget) {
+      closeBottomSheet();
     }
   };
 
@@ -225,8 +268,9 @@ export default function ChatUI() {
                       key={product.id}
                       className="keen-slider__slide p-1"
                       style={{ minWidth: '200px', maxWidth: '200px' }}
+                      onClick={() => handleProductClick(product)}
                     >
-                      <div className="border border-gray-200 rounded-lg p-3 h-full flex flex-col justify-between hover:shadow-md transition bg-white">
+                      <div className="border border-gray-200 rounded-lg p-3 h-full flex flex-col justify-between hover:shadow-md transition bg-white cursor-pointer">
                         <div>
                           <h3 className="font-medium text-sm text-gray-800 truncate" title={product.title}>{product.title}</h3>
                           <p className="text-xs text-gray-500 truncate" title={product.category}>{product.category}</p>
@@ -285,6 +329,90 @@ export default function ChatUI() {
           </div>
         </div>
       </div>
+
+      {/* Product Details Bottom Sheet */}
+      {(isBottomSheetOpen || selectedProduct) && (
+        <div 
+          className={`fixed inset-0 z-50 flex items-end justify-center transition-opacity duration-300 ${
+            isBottomSheetOpen ? 'backdrop-blur-sm' : 'pointer-events-none'
+          }`}
+          style={{
+            backgroundColor: isBottomSheetOpen ? 'rgba(0, 0, 0, 0.03)' : 'rgba(0, 0, 0, 0)'
+          }}
+          onClick={handleBackdropClick}
+        >
+          <div 
+            className="bg-white rounded-t-xl w-full max-w-screen-md max-h-[80vh] overflow-y-auto shadow-xl transform transition-transform duration-300 ease-in-out"
+            style={{ 
+              transform: isBottomSheetOpen ? 'translateY(0)' : 'translateY(100%)',
+            }}
+          >
+            {/* Bottom sheet header with close button */}
+            <div className="flex justify-between items-center p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+              <h2 className="text-xl font-semibold text-gray-800">{selectedProduct?.title}</h2>
+              <button 
+                onClick={closeBottomSheet}
+                className="p-2 rounded-full hover:bg-gray-100 transition"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Product details content */}
+            <div className="p-6">
+              {/* Brand and SKU */}
+              <div className="mb-4 flex justify-between items-center">
+                <span className="text-gray-500 text-sm">SKU: {selectedProduct?.id}</span>
+                <span className="text-sm font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                  {selectedProduct?.brand}
+                </span>
+              </div>
+              
+              {/* Categories */}
+              <div className="mb-4">
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span>{selectedProduct?.topCategory}</span>
+                  {selectedProduct?.secondaryCategory && (
+                    <>
+                      <span>•</span>
+                      <span>{selectedProduct?.secondaryCategory}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              
+              {/* Product description */}
+              <div className="mb-6">
+                <h3 className="text-lg font-medium mb-2 text-gray-700">Description</h3>
+                <p className="text-gray-600">{selectedProduct?.fullDescription}</p>
+              </div>
+              
+              {/* Features */}
+              <div className="mb-6">
+                <h3 className="text-lg font-medium mb-2 text-gray-700">Features</h3>
+                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                  {selectedProduct?.features.split(/\s{2,}/).map((feature, index) => (
+                    <li key={index}>{feature}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              {/* Recommended Age */}
+              <div className="mb-6">
+                <h3 className="text-lg font-medium mb-2 text-gray-700">Recommended Age</h3>
+                <p className="text-gray-600">{selectedProduct?.ageRange}</p>
+              </div>
+              
+              {/* Call to action button */}
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
