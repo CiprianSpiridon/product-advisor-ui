@@ -1,0 +1,122 @@
+.arrow {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  fill: #333;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.arrow--left {
+  left: -10px;
+}
+
+.arrow--right {
+  left: auto;
+  right: -10px;
+}
+
+.arrow--disabled {
+  fill: rgba(51, 51, 51, 0.5);
+  cursor: not-allowed;
+}
+
+/* Make sure carousel container has space for arrows */
+.keen-slider {
+  overflow: visible;
+  padding: 0 12px;
+}
+
+/* Fix for mobile viewports */
+/* First we get the viewport height and we multiply it by 1% to get a value for a vh unit */
+:root {
+  --vh: 1vh;
+  --header-height: 64px; /* Adjust based on your header's height */
+  --footer-height: 72px; /* Adjust based on your input area's height */
+}
+
+/* Then we set the height of our chat container using the variable */
+.chat-container {
+  height: 100vh; /* Fallback for browsers that do not support Custom Properties */
+  height: calc(var(--vh, 1vh) * 100);
+  min-height: -webkit-fill-available; /* Mobile Safari */
+  max-height: -webkit-fill-available; /* Mobile Safari */
+  padding-top: env(safe-area-inset-top, 0); /* iOS notch support */
+}
+
+/* iOS keyboard fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Remove body.has-keyboard padding to avoid double padding */
+  /* body.has-keyboard {
+    padding-bottom: 50vh;
+  } */
+  
+  .chat-container.has-keyboard {
+    /* Allow scrolling inside the container when keyboard is open */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 50vh; /* Only apply padding here */
+  }
+  
+  /* Enhanced fixed positioning for iOS */
+  header, .header-component {
+    position: -webkit-sticky;
+    position: fixed;
+    top: 0;
+    top: env(safe-area-inset-top, 0); /* iOS notch support */
+    z-index: 100; /* Ensure header is above everything */
+    -webkit-transform: translateZ(0); /* Force GPU acceleration */
+    transform: translateZ(0);
+  }
+  
+  .sticky {
+    position: -webkit-sticky;
+  }
+}
+
+/* Ensure header remains fixed with high priority regardless of keyboard state */
+.header-component {
+  position: fixed !important;
+  z-index: 100 !important; 
+  width: 100%;
+  left: 0;
+  right: 0;
+  top: 0;
+  top: env(safe-area-inset-top, 0);
+  -webkit-backface-visibility: hidden;
+}
+
+/* Special state when keyboard is active */
+.header-component.keyboard-active {
+  z-index: 200 !important;
+  position: fixed !important;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* When keyboard is open, ensure content remains visible */
+input:focus {
+  position: relative;
+  z-index: 30; /* Higher than other z-indices */
+}
+
+/* Add a CSS utility for fixed header spacer */
+.header-spacer {
+  height: var(--header-height);
+  min-height: var(--header-height);
+  flex-shrink: 0;
+}
+
+/* Content area should have enough bottom padding for the fixed input */
+.message-content {
+  padding-bottom: var(--footer-height);
+}
+
+/* Make all input/select placeholders darker for accessibility */
+input::placeholder, select::placeholder, textarea::placeholder {
+  color: #374151 !important; /* Tailwind gray-700 */
+  opacity: 1;
+} 

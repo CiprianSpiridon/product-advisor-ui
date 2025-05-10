@@ -193,15 +193,15 @@ export default function ChatUI() {
 
   return (
     <div className="flex flex-col h-screen max-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-blue-600 text-white py-4 px-6 shadow-md">
+      {/* Header - Make sticky */}
+      <header className="bg-blue-600 text-white py-4 px-6 shadow-md sticky top-0 z-20">
         <div className="flex items-center gap-2">
           <MdOutlineShoppingBag className="text-2xl" />
           <h1 className="text-xl font-semibold">Product Assistant</h1>
         </div>
       </header>
 
-      {/* Main content */}
+      {/* Main content - Adjust to work with sticky header */}
       <div className="flex flex-1 overflow-hidden">
         {/* Chat area */}
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -260,7 +260,7 @@ export default function ChatUI() {
           {/* Related Products Carousel */}
           {relatedProducts.length > 0 && (
             <div className="p-4 border-t border-gray-200 bg-white">
-              <h2 className="text-lg font-medium mb-3 text-gray-700 px-2">Related Products</h2>
+              <h2 className="text-lg font-medium mb-3 text-gray-700 px-2">Recommended Products</h2>
               <div className="relative">
                 <div ref={sliderRef} className="keen-slider">
                   {relatedProducts.map((product) => (
@@ -272,8 +272,11 @@ export default function ChatUI() {
                     >
                       <div className="border border-gray-200 rounded-lg p-3 h-full flex flex-col justify-between hover:shadow-md transition bg-white cursor-pointer">
                         <div>
-                          <h3 className="font-medium text-sm text-gray-800 truncate" title={product.title}>{product.title}</h3>
+                          <h3 className="font-bold text-sm text-gray-800 truncate" title={product.title}>{product.title}</h3>
                           <p className="text-xs text-gray-500 truncate" title={product.category}>{product.category}</p>
+                          <p className="text-xs text-gray-600 mt-1 line-clamp-2 h-8" title={product.fullDescription}>
+                            {product.fullDescription}
+                          </p>
                         </div>
                         <div className="flex justify-between items-center mt-2">
                           <span className="font-bold text-blue-600 text-sm">{product.price}</span>
@@ -303,8 +306,8 @@ export default function ChatUI() {
             </div>
           )}
 
-          {/* Input area */}
-          <div className="border-t border-gray-200 p-4 bg-white">
+          {/* Input area - Make sticky */}
+          <div className="border-t border-gray-200 p-4 bg-white sticky bottom-0 z-10">
             <form
               onSubmit={handleSendMessage}
               className="max-w-3xl mx-auto flex gap-2"
