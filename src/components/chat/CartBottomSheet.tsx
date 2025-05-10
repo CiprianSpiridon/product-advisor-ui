@@ -123,7 +123,7 @@ const CartBottomSheet: React.FC<CartBottomSheetProps> = ({
           
           <button 
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition"
-            onClick={() => toast.error('Not Ready Yet')}
+            onClick={() => toast.error('Hold your horses, we don\'t have payments enabled :)', { position: 'bottom-center', duration: 3000 })}
           >
             Buy Now
           </button>
