@@ -10,7 +10,6 @@ import React from 'react';
 import Header from './Header';
 import MessageList, { Message } from './MessageList';
 import InputArea from './InputArea';
-import ProductCarousel from './ProductCarousel';
 import ProductBottomSheet from './ProductBottomSheet';
 import UserDetailsSheet from './UserDetailsSheet';
 import CartBottomSheet, { CartItem } from './CartBottomSheet';
@@ -32,7 +31,6 @@ export default function ChatUI() {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [relatedProducts, setRelatedProducts] = useState<ProductType[]>([]);
   const [viewportHeight, setViewportHeight] = useState('100vh');
   
   // User state
@@ -183,21 +181,17 @@ export default function ChatUI() {
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
-    setRelatedProducts([]);
     try {
       const response = await axios.post<ApiResponse>(`${API_URL}/chat`, {
         query: userMessage.content,
         user,
+        instructions: "Do not invent or make up product names. Only use real products from the database. If you cannot find a matching product, acknowledge that you don\'t have information about that product instead of making one up."
       });
       const assistantMessageContent = response.data.answer;
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: assistantMessageContent,
-        sender: 'assistant',
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+      let productsForMessage: ProductType[] | undefined = undefined;
+
       if (response.data.relatedProducts && Array.isArray(response.data.relatedProducts)) {
-        const productsForCarousel = response.data.relatedProducts.map((product: ApiRelatedProduct) => {
+        productsForMessage = response.data.relatedProducts.map((product: ApiRelatedProduct) => {
           return {
             id: product.sku,
             title: product.name,
@@ -213,8 +207,15 @@ export default function ChatUI() {
             url: product.url
           };
         });
-        setRelatedProducts(productsForCarousel);
       }
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: assistantMessageContent,
+        sender: 'assistant',
+        relatedProducts: productsForMessage,
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error asking question:', error);
       toast.error('Failed to get an answer. Please try again later.');
@@ -287,10 +288,6 @@ export default function ChatUI() {
           messages={messages}
           isLoading={isLoading}
           messagesEndRef={messagesEndRef}
-        />
-
-        <ProductCarousel 
-          products={relatedProducts}
           onProductClick={handleProductClick}
         />
 
@@ -306,7 +303,7 @@ export default function ChatUI() {
       <ProductBottomSheet 
         isOpen={isBottomSheetOpen}
         product={selectedProduct}
-        products={relatedProducts}
+        products={selectedProduct ? [selectedProduct] : []}
         onClose={closeBottomSheet}
         onBackdropClick={handleBackdropClick}
         onAddToCart={handleAddToCart}
