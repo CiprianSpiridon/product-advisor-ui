@@ -40,25 +40,13 @@ export const InputArea: React.FC<InputAreaProps> = ({
       
       // Small delay to allow the keyboard to appear
       setTimeout(() => {
-        // iOS/Safari keyboard fix
-        if (document.activeElement?.tagName === 'INPUT') {
-          // Scroll with buffer to keep header visible
-          window.scrollTo({
-            top: document.body.scrollHeight - 200,
-            behavior: 'smooth'
-          });
-        }
-        
-        // Ensure the viewport stays in the proper position
+        // Ensure the input is focused and visible
         if (inputRef.current) {
           // Set focus again to ensure keyboard stays open
           inputRef.current.focus();
           
-          // Scroll the input into view with more space above
-          inputRef.current.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' // Center in viewport instead of just making visible
-          });
+          // Remove all automatic scrolling behavior - the browser's default will handle keeping 
+          // the input visible when the keyboard appears, which is much less aggressive
         }
       }, 300);
     };

@@ -71,17 +71,18 @@ export default function ChatUI() {
       // Update --vh CSS variable for use in CSS
       document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
       
-      // Improve keyboard handling on iOS/Safari
+      // We don't need this - it's already handled in InputArea.tsx
+      // and causes double-scrolling making the input go too high
+      /*
       if (document.activeElement?.tagName === 'INPUT') {
-        // Allow some time for the keyboard to fully appear
         setTimeout(() => {
-          // Scroll to the active input
           (document.activeElement as HTMLElement).scrollIntoView({
             behavior: 'smooth',
             block: 'center'
           });
         }, 100);
       }
+      */
     };
 
     // Set initial height
@@ -91,20 +92,21 @@ export default function ChatUI() {
     window.addEventListener('resize', setHeight);
     window.addEventListener('orientationchange', setHeight);
     
-    // Also handle on focus event for inputs
+    // Also handle on focus event for inputs - Removing this too as it's handled in InputArea
+    /*
     const handleFocusIn = (e: FocusEvent) => {
       if (e.target instanceof HTMLInputElement) {
-        // Delay to ensure keyboard is fully shown
         setTimeout(() => setHeight(), 300);
       }
     };
     
     document.addEventListener('focusin', handleFocusIn);
+    */
 
     return () => {
       window.removeEventListener('resize', setHeight);
       window.removeEventListener('orientationchange', setHeight);
-      document.removeEventListener('focusin', handleFocusIn);
+      //document.removeEventListener('focusin', handleFocusIn);
     };
   }, []);
 
